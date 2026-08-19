@@ -1,8 +1,10 @@
+import LandingPage from './pages/LandingPage.jsx'
+
 function App() {
 
   return (
     <>
-      <div>SIGNUP WIZARD REPLICATION</div>
+      <LandingPage />
     </>
   )
 }
