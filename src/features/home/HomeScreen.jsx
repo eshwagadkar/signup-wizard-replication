@@ -13,7 +13,7 @@ const events = [
   },
 ];
 
-export default function HomeScreen() {
+export default function HomeScreen({ onProtectedAction }) {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       <header className="border-b border-white/10 px-6 py-5">
@@ -25,6 +25,7 @@ export default function HomeScreen() {
           <div className="flex items-center gap-4">
             <button
               type="button"
+              onClick={onProtectedAction}
               className="text-sm text-zinc-300"
             >
               Notifications
@@ -32,6 +33,7 @@ export default function HomeScreen() {
 
             <button
               type="button"
+              onClick={onProtectedAction}
               className="text-sm text-zinc-300"
             >
               Chat
@@ -74,6 +76,7 @@ export default function HomeScreen() {
 
                 <button
                   type="button"
+                  onClick={onProtectedAction}
                   className="mt-5 w-full rounded-full border border-white/20 px-5 py-3 text-sm font-semibold transition hover:bg-white hover:text-black"
                 >
                   Join

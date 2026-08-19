@@ -6,10 +6,12 @@ import TermsModal from "../features/landing/TermsModal.jsx";
 import LocationScreen from "../features/landing/LocationScreen.jsx";
 import HomeScreen from "../features/home/HomeScreen.jsx";
 import Toast from "../components/Feedback/Toast.jsx";
+import AccountRequiredModal from "../features/authentication/AccountRequiredModal.jsx";
+import EmailScreen from "../features/authentication/EmailScreen.jsx";
 
 export default function LandingPage() {
   const [stage, setStage] = useState("landing");
-
+  const [authMode, setAuthMode] = useState("signup");
   const [toast, setToast] = useState({
     message: "",
     type: "error",
@@ -24,14 +26,41 @@ export default function LandingPage() {
     });
   };
 
+   const clearToast = () => {
+    setToast({
+      message: "",
+      type: "error",
+    });
+  };
+
   const handleLocationSuccess = (locationData) => {
     setLocation(locationData);
+
+    if (authMode === "signin") {
+      setStage("email");
+      return;
+    }
 
     setStage("home");
   };
 
   const handleLocationError = (message) => {
     showToast(message);
+  };
+
+  const handleProtectedAction = () => {
+    setStage("account-required");
+  };
+
+  const handleGetStarted = () => {
+    setAuthMode("signup");
+    setStage("email");
+  };
+
+  const handleEmailSubmit = async (email) => {
+   console.log("Simulated email submission:", email);
+
+  showToast("Email submitted. OTP verification is the next milestone.", "success");
   };
 
   if (stage === "location") {
@@ -45,19 +74,60 @@ export default function LandingPage() {
         <Toast
           message={toast.message}
           type={toast.type}
-          onClose={() =>
-            setToast({
-              message: "",
-              type: "error",
-            })
-          }
+          onClose={clearToast}
         />
       </>
     );
   }
 
   if (stage === "home") {
-    return <HomeScreen location={location} />;
+    return (
+      <>
+        <HomeScreen
+          onProtectedAction={handleProtectedAction}
+        />
+
+        <AccountRequiredModal
+          open={false}
+          onGetStarted={handleGetStarted}
+          onDismiss={() => setStage("home")}
+        />
+      </>
+    );
+  }
+
+  if (stage === "account-required") {
+    return (
+      <>
+        <HomeScreen
+          onProtectedAction={handleProtectedAction}
+        />
+
+        <AccountRequiredModal
+          open
+          onGetStarted={handleGetStarted}
+          onDismiss={() => setStage("home")}
+        />
+      </>
+    );
+  }
+
+   if (stage === "email") {
+    return (
+      <>
+        <EmailScreen
+          mode={authMode}
+          onBack={() => setStage("home")}
+          onSubmit={handleEmailSubmit}
+        />
+
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={clearToast}
+        />
+      </>
+    );
   }
 
   return (
@@ -73,20 +143,22 @@ export default function LandingPage() {
 
       <TermsModal
         open={stage === "terms"}
-        onAccept={() => setStage("location")}
-        onAlreadyHaveAccount={() => setStage("location")}
+        onAccept={() => {
+          setAuthMode("signup");
+          setStage("location");
+        }}
+        onAlreadyHaveAccount={() => {
+          setAuthMode("signin");
+          setStage("location");
+        }}
       />
 
       <Toast
         message={toast.message}
         type={toast.type}
-        onClose={() =>
-          setToast({
-            message: "",
-            type: "error",
-          })
-        }
+        onClose={clearToast}
       />
+    
     </>
   );
 }
