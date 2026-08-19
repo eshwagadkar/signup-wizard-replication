@@ -1,52 +1,92 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import LandingScreen from '../features/landing/LandingScreen.jsx'
-import WarningModal from '../features/landing/WarningModal.jsx'
-import TermsModal from '../features/landing/TermsModal.jsx'
+import LandingScreen from "../features/landing/LandingScreen.jsx";
+import WarningModal from "../features/landing/WarningModal.jsx";
+import TermsModal from "../features/landing/TermsModal.jsx";
+import LocationScreen from "../features/landing/LocationScreen.jsx";
+import HomeScreen from "../features/home/HomeScreen.jsx";
+import Toast from "../components/Feedback/Toast.jsx";
 
-function EntryPage() {
-  const [showWarning, setShowWarning] = useState(false)
-  const [showTerms, setShowTerms] = useState(false)
+export default function LandingPage() {
+  const [stage, setStage] = useState("landing");
 
-  const handleLandingContinue = () => {
-    setShowWarning(true)
+  const [toast, setToast] = useState({
+    message: "",
+    type: "error",
+  });
+
+  const [location, setLocation] = useState(null);
+
+  const showToast = (message, type = "error") => {
+    setToast({
+      message,
+      type,
+    });
+  };
+
+  const handleLocationSuccess = (locationData) => {
+    setLocation(locationData);
+
+    setStage("home");
+  };
+
+  const handleLocationError = (message) => {
+    showToast(message);
+  };
+
+  if (stage === "location") {
+    return (
+      <>
+        <LocationScreen
+          onSuccess={handleLocationSuccess}
+          onError={handleLocationError}
+        />
+
+        <Toast
+          message={toast.message}
+          type={toast.type}
+          onClose={() =>
+            setToast({
+              message: "",
+              type: "error",
+            })
+          }
+        />
+      </>
+    );
   }
 
-  const handleWarningContinue = () => {
-    setShowWarning(false)
-    setShowTerms(true)
-  }
-
-  const handleTermsAccept = () => {
-    setShowTerms(false)
-
-    // Milestone 4:
-    // transition to the Location flow.
-  }
-
-  const handleAlreadyHaveAccount = () => {
-    setShowTerms(false)
-
-    // Future existing-user flow:
-    // Location → Email → OTP → Sign In
+  if (stage === "home") {
+    return <HomeScreen location={location} />;
   }
 
   return (
     <>
-      <LandingScreen onContinue={handleLandingContinue} />
+      <LandingScreen
+        onContinue={() => setStage("warning")}
+      />
 
       <WarningModal
-        open={showWarning}
-        onContinue={handleWarningContinue}
+        open={stage === "warning"}
+        onContinue={() => setStage("terms")}
       />
 
       <TermsModal
-        open={showTerms}
-        onAccept={handleTermsAccept}
-        onAlreadyHaveAccount={handleAlreadyHaveAccount}
+        open={stage === "terms"}
+        onAccept={() => setStage("location")}
+        onAlreadyHaveAccount={() => setStage("location")}
+      />
+
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={() =>
+          setToast({
+            message: "",
+            type: "error",
+          })
+        }
       />
     </>
-  )
+  );
 }
-
-export default EntryPage
