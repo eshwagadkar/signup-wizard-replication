@@ -13,7 +13,7 @@ const events = [
   },
 ];
 
-export default function HomeScreen({ onProtectedAction }) {
+export default function HomeScreen({ onProtectedAction, isAuthenticated = false, }) {
   return (
     <main className="min-h-screen bg-zinc-950 text-white">
       <header className="border-b border-white/10 px-6 py-5">
@@ -23,21 +23,29 @@ export default function HomeScreen({ onProtectedAction }) {
           </div>
 
           <div className="flex items-center gap-4">
-            <button
-              type="button"
-              onClick={onProtectedAction}
-              className="text-sm text-zinc-300"
-            >
-              Notifications
-            </button>
+            {isAuthenticated ? (
+              <span className="text-sm text-zinc-400">
+                Signed in
+              </span>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={onProtectedAction}
+                  className="text-sm text-zinc-300"
+                >
+                  Notifications
+                </button>
 
-            <button
-              type="button"
-              onClick={onProtectedAction}
-              className="text-sm text-zinc-300"
-            >
-              Chat
-            </button>
+                <button
+                  type="button"
+                  onClick={onProtectedAction}
+                  className="text-sm text-zinc-300"
+                >
+                  Chat
+                </button>
+              </>
+            )}
           </div>
         </div>
       </header>
@@ -77,9 +85,10 @@ export default function HomeScreen({ onProtectedAction }) {
                 <button
                   type="button"
                   onClick={onProtectedAction}
+                  disabled={isAuthenticated}
                   className="mt-5 w-full rounded-full border border-white/20 px-5 py-3 text-sm font-semibold transition hover:bg-white hover:text-black"
                 >
-                  Join
+                  {isAuthenticated ? "Joined" : "Join"}
                 </button>
               </div>
             </article>

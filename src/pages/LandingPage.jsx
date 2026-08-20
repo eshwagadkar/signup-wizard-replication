@@ -8,16 +8,19 @@ import HomeScreen from "../features/home/HomeScreen.jsx";
 import Toast from "../components/Feedback/Toast.jsx";
 import AccountRequiredModal from "../features/authentication/AccountRequiredModal.jsx";
 import EmailScreen from "../features/authentication/EmailScreen.jsx";
+import OtpScreen from "../features/authentication/OtpScreen.jsx";
+import { submitEmail, verifyOtp } from "../services/authService.js";
 
 export default function LandingPage() {
   const [stage, setStage] = useState("landing");
   const [authMode, setAuthMode] = useState("signup");
+  const [email, setEmail] = useState("");
+  const [location, setLocation] = useState(null);
   const [toast, setToast] = useState({
     message: "",
     type: "error",
   });
 
-  const [location, setLocation] = useState(null);
 
   const showToast = (message, type = "error") => {
     setToast({
@@ -57,11 +60,59 @@ export default function LandingPage() {
     setStage("email");
   };
 
-  const handleEmailSubmit = async (email) => {
-   console.log("Simulated email submission:", email);
+  const handleEmailSubmit = async (submittedEmail) => {
+  try {
+    await submitEmail(submittedEmail);
 
-  showToast("Email submitted. OTP verification is the next milestone.", "success");
-  };
+    setEmail(submittedEmail);
+    setStage("otp");
+  } catch {
+    showToast(
+      "Unable to send the verification code."
+    );
+  }
+};
+
+const handleOtpVerify = async (otp) => {
+  try {
+    const result = await verifyOtp(email, otp);
+
+    if (!result.success) {
+      showToast(result.error);
+      return;
+    }
+
+    if (result.isExistingUser) {
+      setAuthMode("signin");
+      setStage("authenticated-home");
+      return;
+    }
+
+    setStage("signup");
+  } catch {
+    showToast(
+      "Verification failed. Please try again."
+    );
+  }
+};
+
+if (stage === "otp") {
+  return (
+    <>
+      <OtpScreen
+        email={email}
+        onBack={() => setStage("email")}
+        onVerify={handleOtpVerify}
+      />
+
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={clearToast}
+      />
+    </>
+  );
+}
 
   if (stage === "location") {
     return (
@@ -96,6 +147,15 @@ export default function LandingPage() {
     );
   }
 
+  if (stage === "authenticated-home") {
+  return (
+    <HomeScreen
+      isAuthenticated
+      onProtectedAction={() => {}}
+    />
+  );
+}
+
   if (stage === "account-required") {
     return (
       <>
@@ -129,6 +189,23 @@ export default function LandingPage() {
       </>
     );
   }
+
+
+  if (stage === "signup") {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
+      <div className="text-center">
+        <h1 className="text-3xl font-semibold">
+          Signup Wizard
+        </h1>
+
+        <p className="mt-3 text-sm text-zinc-400">
+          Username step begins in Milestone 7.
+        </p>
+      </div>
+    </main>
+  );
+}
 
   return (
     <>
