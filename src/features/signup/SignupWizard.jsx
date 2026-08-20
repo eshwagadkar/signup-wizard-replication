@@ -7,6 +7,7 @@ import PronounsStep from "./components/PronounsStep.jsx";
 import Toast from "../../components/Feedback/Toast.jsx";
 import SignupLocationStep from "./components/SignupLocationStep.jsx";
 import FinalCheckStep from "./components/FinalCheckStep.jsx";
+import { submitSignup } from "../../services/signupService.js";
 
 function SignupWizard({
   email,
@@ -152,8 +153,10 @@ if (step === 6) {
         updateField("inviteCode", value)
       }
       onBack={goToPreviousStep}
-      onSubmit={() => {
-        onComplete?.("submit", formData);
+      onSubmit={async (data) => {
+        await submitSignup(data);
+
+        onComplete?.("success", data);
       }}
     />
   );

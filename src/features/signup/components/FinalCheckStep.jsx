@@ -1,9 +1,54 @@
+import { useState } from "react";
+
+import Button from "../../../components/FormElements/Button.jsx";
+import {
+  finalSignupSchema,
+} from "../../../features/signup/finalSignupSchema.js";
+
 function FinalCheckStep({
   value,
   onChange,
   onBack,
   onSubmit,
 }) {
+  const [isSubmitting, setIsSubmitting] =
+    useState(false);
+
+  const [error, setError] = useState("");
+
+  const handleSubmit = async () => {
+    if (isSubmitting) {
+      return;
+    }
+
+    setError("");
+
+    const result =
+      finalSignupSchema.safeParse(value);
+
+    if (!result.success) {
+      setError(
+        result.error.issues[0].message
+      );
+
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      await onSubmit(result.data);
+    } catch (error) {
+      setError(
+        error instanceof Error
+          ? error.message
+          : "Unable to create your account."
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <main className="min-h-screen bg-black text-white">
       <section className="flex min-h-screen items-center justify-center px-6">
@@ -11,7 +56,8 @@ function FinalCheckStep({
           <button
             type="button"
             onClick={onBack}
-            className="text-sm text-zinc-400 transition hover:text-white"
+            disabled={isSubmitting}
+            className="text-sm text-zinc-400 transition hover:text-white disabled:opacity-50"
           >
             ← Back
           </button>
@@ -88,13 +134,12 @@ function FinalCheckStep({
               type="text"
               value={value.inviteCode}
               onChange={(event) =>
-                onChange(
-                  event.target.value
-                )
+                onChange(event.target.value)
               }
+              disabled={isSubmitting}
               maxLength={50}
               placeholder="Optional"
-              className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-600 focus:border-white/30"
+              className="mt-3 w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-white outline-none placeholder:text-zinc-600 focus:border-white/30 disabled:opacity-50"
             />
 
             <p className="mt-2 text-xs text-zinc-600">
@@ -102,13 +147,24 @@ function FinalCheckStep({
             </p>
           </div>
 
-          <button
+          {error && (
+            <div
+              role="alert"
+              className="mt-5 rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-300"
+            >
+              {error}
+            </div>
+          )}
+
+          <Button
             type="button"
-            onClick={onSubmit}
-            className="mt-8 w-full rounded-full bg-white px-6 py-4 text-sm font-semibold uppercase tracking-wide text-black transition hover:bg-zinc-200"
+            onClick={handleSubmit}
+            loading={isSubmitting}
+            disabled={isSubmitting}
+            className="mt-8 bg-white text-black"
           >
             Sign Up
-          </button>
+          </Button>
         </div>
       </section>
     </main>

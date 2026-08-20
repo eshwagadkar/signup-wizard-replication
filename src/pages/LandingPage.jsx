@@ -11,6 +11,7 @@ import EmailScreen from "../features/authentication/EmailScreen.jsx";
 import OtpScreen from "../features/authentication/OtpScreen.jsx";
 import { submitEmail, verifyOtp } from "../services/authService.js";
 import SignupWizard from "../features/signup/SignupWizard.jsx";
+import SignupSuccess from "../features/signup/SignupSuccess.jsx";
 
 export default function LandingPage() {
   const [stage, setStage] = useState("landing");
@@ -191,25 +192,37 @@ if (stage === "otp") {
     );
   }
 
-
   if (stage === "signup") {
   return (
     <SignupWizard
       email={email}
       onComplete={(action, data) => {
-        if (action === "back") {
-          setStage("email");
-          return;
-        }
 
-    if (action === "submit") {
-      console.log("Signup submission:", data);
+      if (action === "back") {
+        setStage("email");
+        return;
+      }
 
-      // Milestone 12:
-      // simulated signup submission
+     if (action === "success") {
+          console.log(
+            "Signup completed successfully:",
+            data
+          );
+
+          setStage("signup-success");
     }
   }}
  />
+);
+}
+
+if (stage === "signup-success") {
+  return (
+    <SignupSuccess
+      onContinue={() =>
+        setStage("authenticated-home")
+      }
+    />
   );
 }
 
