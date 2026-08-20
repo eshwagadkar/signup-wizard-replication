@@ -10,6 +10,7 @@ import AccountRequiredModal from "../features/authentication/AccountRequiredModa
 import EmailScreen from "../features/authentication/EmailScreen.jsx";
 import OtpScreen from "../features/authentication/OtpScreen.jsx";
 import { submitEmail, verifyOtp } from "../services/authService.js";
+import SignupWizard from "../features/signup/SignupWizard.jsx";
 
 export default function LandingPage() {
   const [stage, setStage] = useState("landing");
@@ -193,17 +194,14 @@ if (stage === "otp") {
 
   if (stage === "signup") {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
-      <div className="text-center">
-        <h1 className="text-3xl font-semibold">
-          Signup Wizard
-        </h1>
-
-        <p className="mt-3 text-sm text-zinc-400">
-          Username step begins in Milestone 7.
-        </p>
-      </div>
-    </main>
+    <SignupWizard
+      email={email}
+      onComplete={(action) => {
+        if (action === "back") {
+          setStage("email");
+        }
+      }}
+    />
   );
 }
 
