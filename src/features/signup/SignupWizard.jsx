@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import UsernameStep from "./components/UsernameStep.jsx";
 import NameStep from "./components/NameStep.jsx";
+import DobStep from "./components/DobStep.jsx";
 
 function SignupWizard({
   email,
@@ -62,6 +63,19 @@ function SignupWizard({
       />
     );
   }
+
+  if (step === 3) {
+  return (
+    <DobStep
+      value={formData.dob}
+      onChange={(value) =>
+        updateField("dob", value)
+      }
+      onNext={goToNextStep}
+      onBack={goToPreviousStep}
+    />
+  );
+}
 
   return (
     <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">

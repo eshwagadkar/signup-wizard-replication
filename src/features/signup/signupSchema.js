@@ -19,3 +19,17 @@ export const nameSchema = z.object({
     .min(1, "Name is required.")
     .max(60, "Name must be 60 characters or less."),
 });
+
+export const dobPartsSchema = z.object({
+  day: z
+    .string()
+    .regex(/^\d{1,2}$/, "Enter a valid day."),
+
+  month: z
+    .string()
+    .regex(/^\d{1,2}$/, "Enter a valid month."),
+
+  year: z
+    .string()
+    .regex(/^\d{4}$/, "Enter a valid year."),
+});
