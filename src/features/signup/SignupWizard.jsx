@@ -3,6 +3,8 @@ import { useState } from "react";
 import UsernameStep from "./components/UsernameStep.jsx";
 import NameStep from "./components/NameStep.jsx";
 import DobStep from "./components/DobStep.jsx";
+import PronounsStep from "./components/PronounsStep.jsx";
+import Toast from "../../components/Feedback/Toast.jsx";
 
 function SignupWizard({
   email,
@@ -21,6 +23,11 @@ function SignupWizard({
     inviteCode: "",
   });
 
+  const [toast, setToast] = useState({
+    message: "",
+    type: "error",
+    });
+
   const updateField = (field, value) => {
     setFormData((current) => ({
       ...current,
@@ -35,6 +42,20 @@ function SignupWizard({
   const goToPreviousStep = () => {
     setStep((current) => Math.max(1, current - 1));
   };
+
+  const showToast = (message, type = "error") => {
+    setToast({
+        message,
+        type,
+    });
+  };
+
+const clearToast = () => {
+    setToast({
+        message: "",
+        type: "error",
+    });
+};
 
   if (step === 1) {
     return (
@@ -74,6 +95,28 @@ function SignupWizard({
       onNext={goToNextStep}
       onBack={goToPreviousStep}
     />
+  );
+}
+
+if (step === 4) {
+  return (
+  <>
+    <PronounsStep
+        value={formData.pronouns}
+        onChange={(value) =>
+        updateField("pronouns", value)
+        }
+        onNext={goToNextStep}
+        onBack={goToPreviousStep}
+        showToast={showToast}
+    />
+
+    <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={clearToast}
+    />
+  </>
   );
 }
 
