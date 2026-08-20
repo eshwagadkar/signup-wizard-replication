@@ -196,12 +196,20 @@ if (stage === "otp") {
   return (
     <SignupWizard
       email={email}
-      onComplete={(action) => {
+      onComplete={(action, data) => {
         if (action === "back") {
           setStage("email");
+          return;
         }
-      }}
-    />
+
+    if (action === "submit") {
+      console.log("Signup submission:", data);
+
+      // Milestone 12:
+      // simulated signup submission
+    }
+  }}
+ />
   );
 }
 

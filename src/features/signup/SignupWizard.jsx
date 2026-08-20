@@ -5,6 +5,8 @@ import NameStep from "./components/NameStep.jsx";
 import DobStep from "./components/DobStep.jsx";
 import PronounsStep from "./components/PronounsStep.jsx";
 import Toast from "../../components/Feedback/Toast.jsx";
+import SignupLocationStep from "./components/SignupLocationStep.jsx";
+import FinalCheckStep from "./components/FinalCheckStep.jsx";
 
 function SignupWizard({
   email,
@@ -120,19 +122,43 @@ if (step === 4) {
   );
 }
 
+if (step === 5) {
   return (
-    <main className="flex min-h-screen items-center justify-center bg-black px-6 text-white">
-      <div className="text-center">
-        <h1 className="text-3xl font-semibold">
-          Next signup step
-        </h1>
+    <>
+      <SignupLocationStep
+        value={formData.location}
+        onChange={(value) =>
+          updateField("location", value)
+        }
+        onNext={goToNextStep}
+        onBack={goToPreviousStep}
+        showToast={showToast}
+      />
 
-        <p className="mt-3 text-sm text-zinc-400">
-          DOB will be implemented in the next milestone.
-        </p>
-      </div>
-    </main>
+      <Toast
+        message={toast.message}
+        type={toast.type}
+        onClose={clearToast}
+      />
+    </>
   );
+}
+
+if (step === 6) {
+  return (
+    <FinalCheckStep
+      value={formData}
+      onChange={(value) =>
+        updateField("inviteCode", value)
+      }
+      onBack={goToPreviousStep}
+      onSubmit={() => {
+        onComplete?.("submit", formData);
+      }}
+    />
+  );
+}
+
 }
 
 export default SignupWizard;

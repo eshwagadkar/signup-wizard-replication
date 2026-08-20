@@ -1,58 +1,24 @@
 import { useEffect, useRef, useState } from "react";
+import { requestLocation } from "../../services/locationService";
 
 function LocationScreen({ onSuccess, onError }) {
     
   const [status, setStatus] = useState("requesting");
   const hasRequested = useRef(false);
 
-  const requestLocation = () => {
+  const requestUserLocation = async () => {
+  setStatus("requesting");
 
-    if (!navigator.geolocation) {
-      setStatus("unavailable");
+  try {
+    const location = await requestLocation();
 
-      onError("Location services are not available in this browser.");
-      return;
-    }
-
-    setStatus("requesting");
-
-    navigator.geolocation.getCurrentPosition(
-      (position) => {
-        const location = {
-          latitude: position.coords.latitude,
-          longitude: position.coords.longitude,
-        };
-
-        setStatus("success");
-        onSuccess(location);
-      },
-      (error) => {
-        setStatus("error");
-
-        switch (error.code) {
-          case error.PERMISSION_DENIED:
-            onError("Location permission was denied.");
-            break;
-
-          case error.POSITION_UNAVAILABLE:
-            onError("Your location is currently unavailable.");
-            break;
-
-          case error.TIMEOUT:
-            onError("The location request timed out.");
-            break;
-
-          default:
-            onError("Unable to retrieve your location.");
-        }
-      },
-      {
-        enableHighAccuracy: false,
-        timeout: 10000,
-        maximumAge: 300000,
-      }
-    );
-  };
+    setStatus("success");
+    onSuccess(location);
+  } catch (error) {
+    setStatus("error");
+    onError(error.message);
+  }
+};
 
   useEffect(() => {
     if (hasRequested.current) {
@@ -60,7 +26,7 @@ function LocationScreen({ onSuccess, onError }) {
     }
 
     hasRequested.current = true;
-    requestLocation();
+    requestUserLocation()
   }, []);
 
   return (
